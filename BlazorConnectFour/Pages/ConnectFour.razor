@@ -15,7 +15,6 @@
 
         GamePiece clickedSpace = board.Board[x, y];
 
-        //The piece must "fall" to the lowest unoccupied space in the clicked column
         if (clickedSpace.Color == PieceColor.Blank)
         {
             while (y < 5)
@@ -71,10 +70,35 @@
                 winningPlay = EvaluatePieceForWinner(i, j, EvaluationDirection.DownRight);
                 if (winningPlay != null) { return winningPlay; }
             }
+            if (i == 6)
+                return IsTieGame();
         }
 
         return winningPlay;
 
+    }
+    private WinningPlay IsTieGame()
+    {
+        int pieceFullfield = 0;
+        for (int i = 0; i < 7; i++)
+        {
+            if (board.Board[i, 0].Color != PieceColor.Blank)
+            {
+                ++pieceFullfield;
+            }
+        }
+        if (pieceFullfield == 7)
+        {
+            return new WinningPlay()
+            {
+                WinningMoves = new List<string>
+        {
+                    "tie"
+                },
+                WinningColor = PieceColor.Blank
+            };
+        }
+        return null;
     }
     private WinningPlay EvaluatePieceForWinner(int i, int j, EvaluationDirection dir)
     {
@@ -128,8 +152,7 @@
             return new WinningPlay()
             {
                 WinningMoves = winningMoves,
-                WinningColor = currentPiece.Color,
-                WinningDirection = dir,
+                WinningColor = currentPiece.Color
             };
         }
 
@@ -156,7 +179,14 @@
 }
 else
 {
-    <h2>@winningPlay.WinningColor Wins! <button class="btn btn-success" @onclick="@(() => Reset())">Reset</button></h2>
+    if (winningPlay.WinningColor == PieceColor.Blank)
+    {
+        <h2>Tie! <button class="btn btn-success" @onclick="@(() => Reset())">Reset</button></h2>
+    }
+    else
+    {
+        <h2>@winningPlay.WinningColor Wins! <button class="btn btn-success" @onclick="@(() => Reset())">Reset</button></h2>
+    }
 }
 
 <div class="board">
@@ -174,4 +204,3 @@ else
         </div>
     }
 </div>
-
